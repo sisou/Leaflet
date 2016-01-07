@@ -6,6 +6,8 @@
 L.LayerGroup = L.Layer.extend({
 
 	initialize: function (layers) {
+        console.log('LayerGroup initialize');
+
 		this._layers = {};
 
 		var i, len;

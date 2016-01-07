@@ -4,6 +4,7 @@
 
 L.Marker.include({
 	_getPopupAnchor: function () {
+		console.log('markerpopup _getPopupanchor');
 		return this.options.icon.options.popupAnchor || [0, 0];
 	}
 });

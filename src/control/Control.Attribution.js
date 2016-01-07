@@ -9,6 +9,8 @@ L.Control.Attribution = L.Control.extend({
 	},
 
 	initialize: function (options) {
+        console.log('ControlAttribuation initialize');
+
 		L.setOptions(this, options);
 
 		this._attributions = {};

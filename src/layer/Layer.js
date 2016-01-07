@@ -7,15 +7,21 @@ L.Layer = L.Evented.extend({
 	},
 
 	addTo: function (map) {
+		console.log('Layer addTo', this);
+
 		map.addLayer(this);
 		return this;
 	},
 
 	remove: function () {
+		console.log('Layer remove');
+
 		return this.removeFrom(this._map || this._mapToAdd);
 	},
 
 	removeFrom: function (obj) {
+		console.log('Layer removeFrom');
+
 		if (obj) {
 			obj.removeLayer(this);
 		}
@@ -23,20 +29,27 @@ L.Layer = L.Evented.extend({
 	},
 
 	getPane: function (name) {
+		console.log('Layer getPane');
+
 		return this._map.getPane(name ? (this.options[name] || name) : this.options.pane);
 	},
 
 	addInteractiveTarget: function (targetEl) {
+		console.log('Layer addInteractiveTarget');
+
 		this._map._targets[L.stamp(targetEl)] = this;
 		return this;
 	},
 
 	removeInteractiveTarget: function (targetEl) {
+		console.log('Layer removeInteractiveTarget');
+
 		delete this._map._targets[L.stamp(targetEl)];
 		return this;
 	},
 
 	_layerAdd: function (e) {
+		console.log('Layer _layerAdd', this);
 		var map = e.target;
 
 		// check in case layer gets added and then removed before the map is ready
@@ -46,6 +59,7 @@ L.Layer = L.Evented.extend({
 		this._zoomAnimated = map._zoomAnimated;
 
 		if (this.getEvents) {
+			console.log('Layer _layerAdd if this.getEvents');
 			map.on(this.getEvents(), this);
 		}
 
@@ -63,6 +77,8 @@ L.Layer = L.Evented.extend({
 
 L.Map.include({
 	addLayer: function (layer) {
+		console.log('Map addLayer', layer);
+
 		var id = L.stamp(layer);
 		if (this._layers[id]) { return layer; }
 		this._layers[id] = layer;
@@ -79,6 +95,8 @@ L.Map.include({
 	},
 
 	removeLayer: function (layer) {
+		console.log('Map removeLayer');
+
 		var id = L.stamp(layer);
 
 		if (!this._layers[id]) { return this; }
@@ -108,10 +126,14 @@ L.Map.include({
 	},
 
 	hasLayer: function (layer) {
+		console.log('Map hasLayer');
+
 		return !!layer && (L.stamp(layer) in this._layers);
 	},
 
 	eachLayer: function (method, context) {
+		console.log('Map eachLayer');
+
 		for (var i in this._layers) {
 			method.call(context, this._layers[i]);
 		}
@@ -119,6 +141,10 @@ L.Map.include({
 	},
 
 	_addLayers: function (layers) {
+        if (layers) {
+		    console.log('Map _addLayers');
+        }
+
 		layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : [];
 
 		for (var i = 0, len = layers.length; i < len; i++) {
@@ -127,6 +153,8 @@ L.Map.include({
 	},
 
 	_addZoomLimit: function (layer) {
+		console.log('Map _addZoomLimit');
+
 		if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
 			this._zoomBoundLayers[L.stamp(layer)] = layer;
 			this._updateZoomLevels();
@@ -134,6 +162,8 @@ L.Map.include({
 	},
 
 	_removeZoomLimit: function (layer) {
+		console.log('Map _removeZoomLimit');
+
 		var id = L.stamp(layer);
 
 		if (this._zoomBoundLayers[id]) {
@@ -143,6 +173,8 @@ L.Map.include({
 	},
 
 	_updateZoomLevels: function () {
+		console.log('Map _updateZoomLevels');
+
 		var minZoom = Infinity,
 		    maxZoom = -Infinity,
 		    oldZoomSpan = this._getZoomSpan();

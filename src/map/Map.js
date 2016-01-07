@@ -21,6 +21,7 @@ L.Map = L.Evented.extend({
 	},
 
 	initialize: function (id, options) { // (HTMLElement or String, Object)
+        console.log('Map initialize');
 		options = L.setOptions(this, options);
 
 		this._initContainer(id);

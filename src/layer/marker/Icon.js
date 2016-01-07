@@ -19,18 +19,25 @@ L.Icon = L.Class.extend({
 	*/
 
 	initialize: function (options) {
+		console.log('Icon initialize');
 		L.setOptions(this, options);
 	},
 
 	createIcon: function (oldIcon) {
+		console.log('icon createicon');
+
 		return this._createIcon('icon', oldIcon);
 	},
 
 	createShadow: function (oldIcon) {
+		console.log('icon createshadow');
+
 		return this._createIcon('shadow', oldIcon);
 	},
 
 	_createIcon: function (name, oldIcon) {
+		console.log('icon _createicon');
+
 		var src = this._getIconUrl(name);
 
 		if (!src) {
@@ -47,6 +54,8 @@ L.Icon = L.Class.extend({
 	},
 
 	_setIconStyles: function (img, name) {
+		console.log('icon _seticonstyles');
+
 		var options = this.options,
 		    size = L.point(options[name + 'Size']),
 		    anchor = L.point(name === 'shadow' && options.shadowAnchor || options.iconAnchor ||
@@ -66,12 +75,16 @@ L.Icon = L.Class.extend({
 	},
 
 	_createImg: function (src, el) {
+		console.log('icon _createimg');
+
 		el = el || document.createElement('img');
 		el.src = src;
 		return el;
 	},
 
 	_getIconUrl: function (name) {
+		console.log('icon _geticonurl');
+
 		return L.Browser.retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url'];
 	}
 });

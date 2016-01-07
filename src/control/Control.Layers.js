@@ -11,6 +11,8 @@ L.Control.Layers = L.Control.extend({
 	},
 
 	initialize: function (baseLayers, overlays, options) {
+        console.log('ControlLayers initialize');
+
 		L.setOptions(this, options);
 
 		this._layers = {};

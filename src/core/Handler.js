@@ -5,6 +5,8 @@
 
 L.Handler = L.Class.extend({
 	initialize: function (map) {
+        console.log('Handler initialize');
+
 		this._map = map;
 	},
 

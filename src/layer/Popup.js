@@ -29,6 +29,8 @@ L.Popup = L.Layer.extend({
 	},
 
 	initialize: function (options, source) {
+        console.log('Popup initialize');
+
 		L.setOptions(this, options);
 
 		this._source = source;

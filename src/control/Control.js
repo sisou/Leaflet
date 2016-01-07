@@ -9,6 +9,8 @@ L.Control = L.Class.extend({
 	},
 
 	initialize: function (options) {
+        console.log('Control initialize');
+
 		L.setOptions(this, options);
 	},
 

@@ -4,10 +4,13 @@
 
 L.Handler.MarkerDrag = L.Handler.extend({
 	initialize: function (marker) {
+		console.log('MarkerDrag initialize');
 		this._marker = marker;
 	},
 
 	addHooks: function () {
+		console.log('MarkerDrag addHooks');
+
 		var icon = this._marker._icon;
 
 		if (!this._draggable) {
@@ -24,6 +27,8 @@ L.Handler.MarkerDrag = L.Handler.extend({
 	},
 
 	removeHooks: function () {
+		console.log('MarkerDrag removeHooks');
+
 		this._draggable.off({
 			dragstart: this._onDragStart,
 			drag: this._onDrag,
@@ -36,10 +41,14 @@ L.Handler.MarkerDrag = L.Handler.extend({
 	},
 
 	moved: function () {
+		console.log('MarkerDrag moved');
+
 		return this._draggable && this._draggable._moved;
 	},
 
 	_onDragStart: function () {
+		console.log('MarkerDrag _onDragStart');
+
 		this._marker
 		    .closePopup()
 		    .fire('movestart')
@@ -47,6 +56,8 @@ L.Handler.MarkerDrag = L.Handler.extend({
 	},
 
 	_onDrag: function (e) {
+		console.log('MarkerDrag _onDrag');
+
 		var marker = this._marker,
 		    shadow = marker._shadow,
 		    iconPos = L.DomUtil.getPosition(marker._icon),
@@ -66,6 +77,8 @@ L.Handler.MarkerDrag = L.Handler.extend({
 	},
 
 	_onDragEnd: function (e) {
+		console.log('MarkerDrag _onDragEnd');
+
 		this._marker
 		    .fire('moveend')
 		    .fire('dragend', e);

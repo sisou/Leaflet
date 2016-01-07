@@ -12,6 +12,8 @@ L.Icon.Default = L.Icon.extend({
 	},
 
 	_getIconUrl: function (name) {
+		console.log('icondefault getinconurl');
+
 		var key = name + 'Url';
 
 		if (this.options[key]) {

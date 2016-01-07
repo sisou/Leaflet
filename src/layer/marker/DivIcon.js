@@ -17,6 +17,7 @@ L.DivIcon = L.Icon.extend({
 	},
 
 	createIcon: function (oldIcon) {
+		console.log('divicon createicon');
 		var div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : document.createElement('div'),
 		    options = this.options;
 
@@ -32,6 +33,7 @@ L.DivIcon = L.Icon.extend({
 	},
 
 	createShadow: function () {
+		console.log('divicon createshadow');
 		return null;
 	}
 });

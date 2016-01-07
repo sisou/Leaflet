@@ -5,6 +5,8 @@
 L.GeoJSON = L.FeatureGroup.extend({
 
 	initialize: function (geojson, options) {
+        console.log('GeoJSON initialize');
+
 		L.setOptions(this, options);
 
 		this._layers = {};

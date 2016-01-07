@@ -15,6 +15,8 @@ L.ImageOverlay = L.Layer.extend({
 	},
 
 	initialize: function (url, bounds, options) { // (String, LatLngBounds, Object)
+        console.log('ImageOverlay initialize');
+
 		this._url = url;
 		this._bounds = L.latLngBounds(bounds);
 

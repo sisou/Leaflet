@@ -21,11 +21,15 @@ L.Marker = L.Layer.extend({
 	},
 
 	initialize: function (latlng, options) {
+		console.log('marker initialize');
+
 		L.setOptions(this, options);
 		this._latlng = L.latLng(latlng);
 	},
 
 	onAdd: function (map) {
+		console.log('marker onadd');
+
 		this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
 
 		this._initIcon();
@@ -33,6 +37,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	onRemove: function () {
+		console.log('marker onremove');
+
 		if (this.dragging && this.dragging.enabled()) {
 			this.options.draggable = true;
 			this.dragging.removeHooks();
@@ -43,6 +49,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	getEvents: function () {
+		console.log('marker getevents');
+
 		var events = {
 			zoom: this.update,
 			viewreset: this.update
@@ -56,10 +64,14 @@ L.Marker = L.Layer.extend({
 	},
 
 	getLatLng: function () {
+		console.log('marker getlatlng');
+
 		return this._latlng;
 	},
 
 	setLatLng: function (latlng) {
+		console.log('marker setlatlng');
+
 		var oldLatLng = this._latlng;
 		this._latlng = L.latLng(latlng);
 		this.update();
@@ -67,20 +79,28 @@ L.Marker = L.Layer.extend({
 	},
 
 	setZIndexOffset: function (offset) {
+		console.log('marker setzindexoffset');
+
 		this.options.zIndexOffset = offset;
 		return this.update();
 	},
 
 	setIcon: function (icon) {
+		console.log('marker seticon');
+
 
 		this.options.icon = icon;
 
 		if (this._map) {
+            console.log('marker seticon this._map');
+
 			this._initIcon();
 			this.update();
 		}
 
 		if (this._popup) {
+            console.log('marker seticon this._popup');
+
 			this.bindPopup(this._popup, this._popup.options);
 		}
 
@@ -88,10 +108,14 @@ L.Marker = L.Layer.extend({
 	},
 
 	getElement: function () {
+		console.log('marker getelement');
+
 		return this._icon;
 	},
 
 	update: function () {
+		console.log('marker update');
+
 
 		if (this._icon) {
 			var pos = this._map.latLngToLayerPoint(this._latlng).round();
@@ -102,6 +126,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	_initIcon: function () {
+		console.log('marker _initicon');
+
 		var options = this.options,
 		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
 
@@ -110,15 +136,20 @@ L.Marker = L.Layer.extend({
 
 		// if we're not reusing the icon, remove the old one and init new one
 		if (icon !== this._icon) {
+            console.log('marker _initicon icon !== this._icon');
+
 			if (this._icon) {
 				this._removeIcon();
 			}
 			addIcon = true;
+			console.log(addIcon);
 
 			if (options.title) {
+                console.log('marker _initicon icon !== this._icon options.title');
 				icon.title = options.title;
 			}
 			if (options.alt) {
+                console.log('marker _initicon icon !== this._icon options.title');
 				icon.alt = options.alt;
 			}
 		}
@@ -132,6 +163,8 @@ L.Marker = L.Layer.extend({
 		this._icon = icon;
 
 		if (options.riseOnHover) {
+            console.log('marker _initicon options.riseOnHover');
+
 			this.on({
 				mouseover: this._bringToFront,
 				mouseout: this._resetZIndex
@@ -158,6 +191,7 @@ L.Marker = L.Layer.extend({
 
 
 		if (addIcon) {
+			console.log('marker _initicon addIcon');
 			this.getPane().appendChild(this._icon);
 		}
 		this._initInteraction();
@@ -167,6 +201,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	_removeIcon: function () {
+		console.log('marker _removeicon');
+
 		if (this.options.riseOnHover) {
 			this.off({
 				mouseover: this._bringToFront,
@@ -181,6 +217,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	_removeShadow: function () {
+		console.log('marker _removeshadow');
+
 		if (this._shadow) {
 			L.DomUtil.remove(this._shadow);
 		}
@@ -188,6 +226,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	_setPos: function (pos) {
+		console.log('marker _setpos');
+
 		L.DomUtil.setPosition(this._icon, pos);
 
 		if (this._shadow) {
@@ -200,16 +240,21 @@ L.Marker = L.Layer.extend({
 	},
 
 	_updateZIndex: function (offset) {
+		console.log('marker _updatezindex');
+
 		this._icon.style.zIndex = this._zIndex + offset;
 	},
 
 	_animateZoom: function (opt) {
+		console.log('marker _animatezoom');
+
 		var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
 
 		this._setPos(pos);
 	},
 
 	_initInteraction: function () {
+		console.log('marker _initinteraction');
 
 		if (!this.options.interactive) { return; }
 
@@ -233,6 +278,9 @@ L.Marker = L.Layer.extend({
 	},
 
 	setOpacity: function (opacity) {
+		console.log('marker setopacity');
+
+
 		this.options.opacity = opacity;
 		if (this._map) {
 			this._updateOpacity();
@@ -242,6 +290,8 @@ L.Marker = L.Layer.extend({
 	},
 
 	_updateOpacity: function () {
+		console.log('marker _updateopacity');
+
 		var opacity = this.options.opacity;
 
 		L.DomUtil.setOpacity(this._icon, opacity);
@@ -252,10 +302,14 @@ L.Marker = L.Layer.extend({
 	},
 
 	_bringToFront: function () {
+		console.log('marker _bringToFront');
+
 		this._updateZIndex(this.options.riseOffset);
 	},
 
 	_resetZIndex: function () {
+		console.log('marker _resetZIndex');
+
 		this._updateZIndex(0);
 	}
 });
