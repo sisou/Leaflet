@@ -13,3 +13,5 @@ mv dist/leaflet-src.js dist/leaflet-src.txt
  rm -r src
  ln -s ../../../../leaflet/Leaflet/src src
 )
+
+touch ../../web/maphub_web/js/app.js
