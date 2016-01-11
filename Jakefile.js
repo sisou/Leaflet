@@ -40,7 +40,7 @@ task('build', {async: true}, function (compsBase32, buildName) {
 		build.build(complete, v, compsBase32, buildName);
 
 	}).on('stdout', function (data) {
-		v = version + ' (' + data.toString() + ')';
+		v = version;
 	}).on('error', function () {
 		v = version;
 	});
