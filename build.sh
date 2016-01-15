@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-jake build
+node_modules/.bin/jake build
+

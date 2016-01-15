@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-jake build
+node_modules/.bin/jake build
 
 (cd ../../web/maphub_web/node_modules/leaflet || exit
 
