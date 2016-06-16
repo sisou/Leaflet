@@ -182,6 +182,9 @@ L.Canvas = L.Renderer.extend({
 		for (i = 0; i < len; i++) {
 			for (j = 0, len2 = parts[i].length; j < len2; j++) {
 				p = parts[i][j];
+				if (this._map._rotate){
+					p = p.add(this._map._getRotatePanePos()).rotateFrom(this._map._bearing, this._map._getRotatePanePos());
+				}
 				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
 			}
 			if (closed) {
