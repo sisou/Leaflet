@@ -744,6 +744,8 @@ L.Map = L.Evented.extend({
 		L.DomUtil.setPosition(this._rotatePane, this._rotatePanePos, this._bearing, this._rotatePanePos);
 
 		this.fire('rotate');
+		// trigger renderer updates
+		this.fire('viewreset');
 	},
 
 	getBearing: function() {
@@ -821,7 +823,7 @@ L.Map = L.Evented.extend({
 			this.createPane('shadowPane', this._rotatePane);
 			// @pane shadowPane: HTMLElement = 5
 			// Pane for overlay shadows (e.g. marker shadows)
-			this.createPane('overlayPane', this._rotatePane);
+			this.createPane('overlayPane');
 			// @pane markerPane: HTMLElement = 6
 			// Pane for marker icons
 			this.createPane('markerPane', this._rotatePane);
