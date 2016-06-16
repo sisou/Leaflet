@@ -74,9 +74,12 @@ L.Renderer = L.Layer.extend({
 		    viewHalf = this._map.getSize().multiplyBy(0.5 + this.options.padding),
 		    currentCenterPoint = this._map.project(this._center, zoom),
 		    destCenterPoint = this._map.project(center, zoom),
-		    centerOffset = destCenterPoint.subtract(currentCenterPoint),
+		    centerOffset = destCenterPoint.subtract(currentCenterPoint);
+		if (this._map._rotate){
+			centerOffset = centerOffset.rotate(map._bearing);
+		}
 
-		    topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
+		var topLeftOffset = viewHalf.multiplyBy(-scale).add(position).add(viewHalf).subtract(centerOffset);
 
 		if (L.Browser.any3d) {
 			L.DomUtil.setTransform(this._container, topLeftOffset, scale);
@@ -94,7 +97,7 @@ L.Renderer = L.Layer.extend({
 		// update pixel bounds of renderer container (for positioning/sizing/clipping later)
 		var p = this.options.padding,
 		    size = this._map.getSize(),
-		    min = this._map.containerPointToLayerPoint(size.multiplyBy(-p)).round();
+		    min = L.point(size.multiplyBy(-p)).subtract(this._map._getMapPanePos()).round();
 
 		this._bounds = new L.Bounds(min, min.add(size.multiplyBy(1 + p * 2)).round());
 
