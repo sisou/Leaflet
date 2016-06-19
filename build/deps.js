@@ -194,6 +194,11 @@ var deps = {
 		desc: 'Enables keyboard pan/zoom when the map is focused.'
 	},
 
+	CompassBearing: {
+		src: ['map/handler/Map.CompassBearing.js'],
+		desc: 'Enables rotating the map based on the device compass'
+	},
+
 	MarkerDrag: {
 		src: ['layer/marker/Marker.Drag.js'],
 		deps: ['Marker'],
