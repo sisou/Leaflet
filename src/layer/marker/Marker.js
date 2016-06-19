@@ -259,7 +259,7 @@ L.Marker = L.Layer.extend({
 		if (this._shadow) {
 			if (this._map._rotate) {
 				if (this.options.icon.options.shadowAnchor){
-					L.DomUtil.setPosition(this._shadow, pos, -this._map._bearing || 0, pos.add(shadowAnchor));
+					L.DomUtil.setPosition(this._shadow, pos, -this._map._bearing || 0, pos.add(this.options.icon.options.shadowAnchor));
 				} else {
 					L.DomUtil.setPosition(this._shadow, pos, -this._map._bearing || 0, pos.add(iconAnchor));
 				}
