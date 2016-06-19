@@ -98,6 +98,10 @@ L.Map = L.Evented.extend({
 		trackResize: true,
 
 		rotate: false
+
+		// @option bearing: Number = 0
+		// Initial bearing of the map, in degrees
+		bearing: 0
 	},
 
 	initialize: function (id, options) { // (HTMLElement or String, Object)
@@ -828,6 +832,9 @@ L.Map = L.Evented.extend({
 			// @pane popupPane: HTMLElement = 7
 			// Pane for popups.
 			this.createPane('popupPane', this._rotatePane);
+			if (this.options.bearing){
+				this.setBearing(this.options.bearing);
+			}
 		}
 		else {
 			// @pane tilePane: HTMLElement = 2
