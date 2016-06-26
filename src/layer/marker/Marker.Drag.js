@@ -81,11 +81,8 @@ L.Handler.MarkerDrag = L.Handler.extend({
 		// update shadow position
 		if (shadow) {
 			if (marker._map._rotate) {
-				if (marker.options.icon.options.shadowAnchor){
-					L.DomUtil.setPosition(shadow, iconPos, -marker._map._bearing || 0, iconPos.add(marker.options.icon.options.shadowAnchor));
-				} else {
-					L.DomUtil.setPosition(shadow, iconPos, -marker._map._bearing || 0, iconPos.add(iconAnchor));
-				}
+				var shadowAnchor = marker.options.icon.options.shadowAnchor ? iconPos.add(marker.options.icon.options.shadowAnchor) : iconPos.add(iconAnchor);
+				L.DomUtil.setPosition(shadow, iconPos, -marker._map._bearing || 0, shadowAnchor);
 			} else {
 				L.DomUtil.setPosition(shadow, iconPos);
 			}
