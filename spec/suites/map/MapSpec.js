@@ -162,12 +162,48 @@ describe("Map", function () {
 		});
 	});
 
-	describe('#setMaxBounds', function () {
-		it("aligns pixel-wise map view center with maxBounds center if it cannot move view bounds inside maxBounds (#1908)", function () {
+	describe("#getBoundsZoom", function () {
+		var halfLength = 0.00025;
+		var bounds = [[-halfLength, -halfLength], [halfLength, halfLength]];
+		var padding = [100, 100];
+		var height = '400px';
+
+		it("returns high levels of zoom with small areas and big padding", function () {
 			var container = map.getContainer();
+			container.style.height = height;
+			document.body.appendChild(container);
+			expect(map.getBoundsZoom(bounds, false, padding)).to.be.equal(19);
+		});
+
+		it("returns multiples of zoomSnap when zoomSnap > 0 on any3d browsers", function () {
+			var container = map.getContainer();
+			container.style.height = height;
+			document.body.appendChild(container);
+			L.Browser.any3d = true;
+			map.options.zoomSnap = 0.5;
+			expect(map.getBoundsZoom(bounds, false, padding)).to.be.equal(19.5);
+			map.options.zoomSnap = 0.2;
+			expect(map.getBoundsZoom(bounds, false, padding)).to.be.equal(19.6);
+			map.options.zoomSnap = 0;
+			expect(map.getBoundsZoom(bounds, false, padding)).to.be.within(19.6864560, 19.6864561);
+		});
+	});
+
+	describe('#setMaxBounds', function () {
+		var container;
+
+		beforeEach(function () {
+			container = map.getContainer();
+			document.body.appendChild(container);
+		});
+
+		afterEach(function () {
+			// document.body.removeChild(container);
+		});
+
+		it("aligns pixel-wise map view center with maxBounds center if it cannot move view bounds inside maxBounds (#1908)", function () {
 			// large view, cannot fit within maxBounds
 			container.style.width = container.style.height = "1000px";
-			document.body.appendChild(container);
 			// maxBounds
 			var bounds = L.latLngBounds([51.5, -0.05], [51.55, 0.05]);
 			map.setMaxBounds(bounds, {animate: false});
@@ -176,13 +212,11 @@ describe("Map", function () {
 			// get center of bounds in pixels
 			var boundsCenter = map.project(bounds.getCenter()).round();
 			expect(map.project(map.getCenter()).round()).to.eql(boundsCenter);
-			document.body.removeChild(container);
 		});
+
 		it("moves map view within maxBounds by changing one coordinate", function () {
-			var container = map.getContainer();
 			// small view, can fit within maxBounds
 			container.style.width = container.style.height = "200px";
-			document.body.appendChild(container);
 			// maxBounds
 			var bounds = L.latLngBounds([51, -0.2], [52, 0.2]);
 			map.setMaxBounds(bounds, {animate: false});
@@ -197,29 +231,22 @@ describe("Map", function () {
 			expect(pixelCenter.y).not.to.eql(pixelInit.y);
 			// the view is inside the bounds
 			expect(bounds.contains(map.getBounds())).to.be(true);
-			document.body.removeChild(container);
 		});
-	});
 
-	describe("#getMinZoom and #getMaxZoom", function () {
-		describe('#getMinZoom', function () {
-			it('returns 0 if not set by Map options or TileLayer options', function () {
-				var map = L.map(document.createElement('div'));
-				expect(map.getMinZoom()).to.be(0);
+		it("remove listeners when called without arguments", function () {
+			L.tileLayer('http://tilecache.openstreetmap.fr/hot/{z}/{x}/{y}.png', {minZoom: 0, maxZoom: 20}).addTo(map);
+			container.style.width = container.style.height = "500px";
+			var bounds = L.latLngBounds([51.5, -0.05], [51.55, 0.05]);
+			map.setMaxBounds(bounds, {animate: false});
+			map.setMaxBounds();
+			// set view outside
+			var center = L.latLng([0, 0]);
+			map.once('moveend', function () {
+				expect(center.equals(map.getCenter())).to.be(true);
 			});
+			map.setView(center, 18, {animate: false});
 		});
 
-		it("minZoom and maxZoom options overrides any minZoom and maxZoom set on layers", function () {
-
-			var map = L.map(document.createElement('div'), {minZoom: 2, maxZoom: 20});
-
-			L.tileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
-
-			expect(map.getMinZoom()).to.be(2);
-			expect(map.getMaxZoom()).to.be(20);
-		});
 	});
 
 	describe("#getMinZoom and #getMaxZoom", function () {
@@ -609,8 +636,26 @@ describe("Map", function () {
 	});
 
 	describe('#flyTo', function () {
+		var div;
 
-		it('move to requested center and zoom, and call zoomend once', function (done) {
+		beforeEach(function () {
+			div = document.createElement('div');
+			div.style.width = '800px';
+			div.style.height = '600px';
+			div.style.visibility = 'hidden';
+
+			document.body.appendChild(div);
+
+			map = L.map(div);
+		});
+
+		afterEach(function () {
+			document.body.removeChild(div);
+		});
+
+		it.skipInPhantom('move to requested center and zoom, and call zoomend once', function (done) {
+			this.timeout(10000); // This test takes longer than usual due to frames
+
 			var spy = sinon.spy(),
 			    newCenter = new L.LatLng(10, 11),
 			    newZoom = 12;
@@ -622,7 +667,253 @@ describe("Map", function () {
 				done();
 			};
 			map.setView([0, 0], 0);
-			map.once('zoomend', callback).flyTo(newCenter, newZoom);
+			map.on('zoomend', callback).flyTo(newCenter, newZoom);
+		});
+
+		it.skipInPhantom('flyTo start latlng == end latlng', function (done) {
+			this.timeout(10000); // This test takes longer than usual due to frames
+
+			var dc = new L.LatLng(38.91, -77.04);
+			map.setView(dc, 14);
+
+			map.on('zoomend', function () {
+				expect(map.getCenter()).to.eql(dc);
+				expect(map.getZoom()).to.eql(4);
+				done();
+			});
+
+			map.flyTo(dc, 4);
+		});
+	});
+
+	describe('#zoomIn and #zoomOut', function () {
+		var center = L.latLng(22, 33);
+		beforeEach(function () {
+			map.setView(center, 10);
+		});
+
+		it('zoomIn zooms by 1 zoom level by default', function (done) {
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(11);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			map.zoomIn(null, {animate: false});
+		});
+
+		it('zoomOut zooms by 1 zoom level by default', function (done) {
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(9);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			map.zoomOut(null, {animate: false});
+		});
+
+		it('zoomIn ignores the zoomDelta option on non-any3d browsers', function (done) {
+			L.Browser.any3d = false;
+			map.options.zoomSnap = 0.25;
+			map.options.zoomDelta = 0.25;
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(11);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			map.zoomIn(null, {animate: false});
+		});
+
+		it('zoomIn respects the zoomDelta option on any3d browsers', function (done) {
+			L.Browser.any3d = true;
+			map.options.zoomSnap = 0.25;
+			map.options.zoomDelta = 0.25;
+			map.setView(center, 10);
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(10.25);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			map.zoomIn(null, {animate: false});
+		});
+
+		it('zoomOut respects the zoomDelta option on any3d browsers', function (done) {
+			L.Browser.any3d = true;
+			map.options.zoomSnap = 0.25;
+			map.options.zoomDelta = 0.25;
+			map.setView(center, 10);
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(9.75);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			map.zoomOut(null, {animate: false});
+		});
+
+		it('zoomIn snaps to zoomSnap on any3d browsers', function (done) {
+			map.options.zoomSnap = 0.25;
+			map.setView(center, 10);
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(10.25);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			L.Browser.any3d = true;
+			map.zoomIn(0.22, {animate: false});
+		});
+
+		it('zoomOut snaps to zoomSnap on any3d browsers', function (done) {
+			map.options.zoomSnap = 0.25;
+			map.setView(center, 10);
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(9.75);
+				expect(map.getCenter()).to.eql(center);
+				done();
+			});
+			L.Browser.any3d = true;
+			map.zoomOut(0.22, {animate: false});
+		});
+	});
+
+	describe('#fitBounds', function () {
+		var center = L.latLng(50.5, 30.51),
+		    bounds = L.latLngBounds(L.latLng(1, 102), L.latLng(11, 122)),
+		    boundsCenter = bounds.getCenter();
+
+		beforeEach(function () {
+			// fitBounds needs a map container with non-null area
+			var container = map.getContainer();
+			container.style.width = container.style.height = "100px";
+			document.body.appendChild(container);
+			map.setView(center, 15);
+		});
+
+		afterEach(function () {
+			document.body.removeChild(map.getContainer());
+		});
+
+		it('Snaps zoom level to integer by default', function (done) {
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(2);
+				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				done();
+			});
+			map.fitBounds(bounds, {animate: false});
+		});
+
+		it('Snaps zoom to zoomSnap on any3d browsers', function (done) {
+			map.options.zoomSnap = 0.25;
+			L.Browser.any3d = true;
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(2.75);
+				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				done();
+			});
+			map.fitBounds(bounds, {animate: false});
+		});
+
+		it('Ignores zoomSnap on non-any3d browsers', function (done) {
+			map.options.zoomSnap = 0.25;
+			L.Browser.any3d = false;
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(2);
+				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				done();
+			});
+			map.fitBounds(bounds, {animate: false});
+		});
+
+		it('can be called with an array', function (done) {
+			map.once('zoomend', function () {
+				expect(map.getZoom()).to.eql(2);
+				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				done();
+			});
+			var bounds = [[1, 102], [11, 122]];
+			map.fitBounds(bounds, {animate: false});
+		});
+
+		it('throws an error with invalid bounds', function () {
+			expect(function () {
+				map.fitBounds(NaN);
+			}).to.throwError();
+		});
+
+		it('Fits to same scale and zoom', function (done) {
+			var bounds = map.getBounds(),
+			    zoom = map.getZoom();
+			map.once('moveend zoomend', function () {
+				var newBounds = map.getBounds();
+				expect(newBounds.getSouthWest()).to.nearLatLng(bounds.getSouthWest());
+				expect(newBounds.getNorthEast()).to.nearLatLng(bounds.getNorthEast());
+				expect(map.getZoom()).to.eql(zoom);
+				done();
+			});
+			map.fitBounds(bounds, {animate: false});
+		});
+
+		it('Fits to small bounds from small zoom', function (done) {
+			map.once('zoomend', function () {
+				map.once('zoomend', function () {
+					expect(map.getZoom()).to.eql(11);
+					expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+					done();
+				});
+				map.fitBounds(bounds);
+			});
+
+			bounds = L.latLngBounds([57.73, 11.93], [57.75, 11.95]);
+			boundsCenter = bounds.getCenter();
+			map.setZoom(0);
+		});
+
+		it('Fits to large bounds from large zoom', function (done) {
+			map.once('zoomend', function () {
+				map.once('zoomend', function () {
+					expect(map.getZoom()).to.eql(0);
+					expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+					done();
+				});
+				map.fitBounds(bounds);
+			});
+
+			bounds = L.latLngBounds([90, -180], [-90, 180]);
+			boundsCenter = bounds.getCenter();
+			map.setZoom(22);
+		});
+	});
+
+
+	describe('#fitBounds after layers set', function () {
+		var center = L.latLng(22, 33),
+		    bounds = L.latLngBounds(L.latLng(1, 102), L.latLng(11, 122)),
+		    boundsCenter = bounds.getCenter();
+
+		beforeEach(function () {
+			// fitBounds needs a map container with non-null area
+			var container = map.getContainer();
+			container.style.width = container.style.height = "100px";
+			document.body.appendChild(container);
+		});
+
+		afterEach(function () {
+			document.body.removeChild(map.getContainer());
+		});
+
+		it('Snaps to a number after adding tile layer', function (done) {
+			L.Browser.any3d = true;
+			map.addLayer(L.tileLayer('file:///dev/null'));
+			expect(map.getZoom()).to.be(undefined);
+			map.fitBounds(bounds);
+			expect(map.getZoom()).to.be(2);
+			done();
+		});
+
+		it('Snaps to a number after adding marker', function (done) {
+			L.Browser.any3d = true;
+			map.addLayer(L.marker(center));
+			expect(map.getZoom()).to.be(undefined);
+			map.fitBounds(bounds);
+			expect(map.getZoom()).to.be(2);
+			done();
 		});
 
 	});
@@ -789,6 +1080,17 @@ describe("Map", function () {
 			var fromZoom = 8.5;
 			var scale = map.getScaleZoom(toZoom, fromZoom);
 			expect(Math.round(map.getZoomScale(scale, fromZoom) * 100) / 100).to.eql(toZoom);
+		});
+	});
+
+	describe('#getZoom', function () {
+		it("returns undefined if map not initialized", function () {
+			expect(map.getZoom()).to.be(undefined);
+		});
+
+		it("returns undefined if map not initialized but layers added", function () {
+			map.addLayer(L.tileLayer('file:///dev/null'));
+			expect(map.getZoom()).to.be(undefined);
 		});
 	});
 });

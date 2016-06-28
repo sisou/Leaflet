@@ -2,9 +2,25 @@
  * L.Handler.ScrollWheelZoom is used by L.Map to enable mouse scroll wheel zoom on the map.
  */
 
+// @namespace Map
+// @section Interaction Options
 L.Map.mergeOptions({
+	// @section Mousewheel options
+	// @option scrollWheelZoom: Boolean|String = true
+	// Whether the map can be zoomed by using the mouse wheel. If passed `'center'`,
+	// it will zoom to the center of the view regardless of where the mouse was.
 	scrollWheelZoom: true,
-	wheelDebounceTime: 40
+
+	// @option wheelDebounceTime: Number = 40
+	// Limits the rate at which a wheel can fire (in milliseconds). By default
+	// user can't zoom via wheel more often than once per 40 ms.
+	wheelDebounceTime: 40,
+
+	// @option wheelPxPerZoomLevel: Number = 50
+	// How many scroll pixels (as reported by [L.DomEvent.getWheelDelta](#domevent-getwheeldelta))
+	// mean a change of one full zoom level. Smaller values will make wheel-zooming
+	// faster (and vice versa).
+	wheelPxPerZoomLevel: 50
 });
 
 L.Map.ScrollWheelZoom = L.Handler.extend({
@@ -40,14 +56,16 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 
 	_performZoom: function () {
 		var map = this._map,
-		    delta = this._delta,
-		    zoom = map.getZoom();
+		    zoom = map.getZoom(),
+		    snap = this._map.options.zoomSnap || 0;
 
-		map.stop(); // stop panning and fly animations if any
+		map._stop(); // stop panning and fly animations if any
 
 		// map the delta with a sigmoid function to -4..4 range leaning on -1..1
-		var d2 = Math.ceil(4 * Math.log(2 / (1 + Math.exp(-Math.abs(delta / 200)))) / Math.LN2);
-		delta = map._limitZoom(zoom + (delta > 0 ? d2 : -d2)) - zoom;
+		var d2 = this._delta / (this._map.options.wheelPxPerZoomLevel * 4),
+		    d3 = 4 * Math.log(2 / (1 + Math.exp(-Math.abs(d2)))) / Math.LN2,
+		    d4 = snap ? Math.ceil(d3 / snap) * snap : d3,
+		    delta = map._limitZoom(zoom + (this._delta > 0 ? d4 : -d4)) - zoom;
 
 		this._delta = 0;
 		this._startTime = null;
@@ -62,4 +80,7 @@ L.Map.ScrollWheelZoom = L.Handler.extend({
 	}
 });
 
+// @section Handlers
+// @property scrollWheelZoom: Handler
+// Scroll wheel zoom handler.
 L.Map.addInitHook('addHandler', 'scrollWheelZoom', L.Map.ScrollWheelZoom);
