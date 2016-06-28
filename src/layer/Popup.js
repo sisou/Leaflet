@@ -359,12 +359,19 @@ L.Popup = L.Layer.extend({
 		if (!this._map) { return; }
 
 		var pos = this._map.latLngToLayerPoint(this._latlng),
-		    offset = L.point(this.options.offset);
+		    offset = L.point(this.options.offset),
+		    anchor = this._getAnchor();
 
 		if (this._zoomAnimated) {
-			L.DomUtil.setPosition(this._container, pos);
+			if (this._map._rotate) {
+				// rotation relative to the marker's anchor
+				var popupAnchor = pos.add([-this._containerLeft, this._container.offsetHeight + this._tipContainer.offsetHeight - offset.y]);
+				L.DomUtil.setPosition(this._container, pos.add(anchor), -this._map._bearing || 0, popupAnchor);
+			} else {
+				L.DomUtil.setPosition(this._container, pos.add(anchor));
+			}
 		} else {
-			offset = offset.add(pos);
+			offset = offset.add(pos).add(anchor);
 		}
 
 		var bottom = this._containerBottom = -offset.y,
@@ -376,8 +383,15 @@ L.Popup = L.Layer.extend({
 	},
 
 	_animateZoom: function (e) {
-		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center);
-		L.DomUtil.setPosition(this._container, pos);
+		var pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
+			anchor = this._getAnchor();
+		if (this._map._rotate) {
+			var offset = L.point(this.options.offset);
+			var popupAnchor = pos.add([-this._containerLeft, this._container.offsetHeight + this._tipContainer.offsetHeight - offset.y]);
+			L.DomUtil.setPosition(this._container, pos.add(anchor), -this._map._bearing || 0, popupAnchor);
+		} else {
+			L.DomUtil.setPosition(this._container, pos.add(anchor));
+		}
 	},
 
 	_adjustPan: function () {
@@ -427,7 +441,13 @@ L.Popup = L.Layer.extend({
 	_onCloseButtonClick: function (e) {
 		this._close();
 		L.DomEvent.stop(e);
+	},
+
+	_getAnchor: function () {
+		// Where should we anchor the popup on the source layer?
+		return L.point(this._source && this._source._getPopupAnchor ? this._source._getPopupAnchor() : [0, 0]);
 	}
+
 });
 
 // @namespace Popup
