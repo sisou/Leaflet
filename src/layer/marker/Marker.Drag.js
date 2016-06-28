@@ -64,7 +64,9 @@ L.Handler.MarkerDrag = L.Handler.extend({
 		    .closePopup()
 		    .fire('movestart')
 		    .fire('dragstart');
-		this._draggable.updateMapBearing(this._marker._map._bearing);
+		if (this._marker._map._rotate){
+			this._draggable.updateMapBearing(this._marker._map._bearing);	
+		}
 	},
 
 	_onDrag: function (e) {
