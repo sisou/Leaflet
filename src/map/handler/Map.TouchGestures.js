@@ -88,7 +88,7 @@ L.Map.TouchGestures = L.Handler.extend({
 			if (bearingDelta) {
 				/// TODO: The pivot should be the last touch point, but zoomAnimation manages to
 				///   overwrite the rotate pane position. Maybe related to #3529.
-				map.setBearing(this._startBearing - bearingDelta, true);
+				map.setBearing(this._startBearing - bearingDelta);
 				this._rotated = true;
 			}
 		}
