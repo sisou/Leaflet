@@ -8,7 +8,7 @@ L.Map.mergeOptions({
 	// @section Touch interaction options
 	// @option touchRotate: Boolean|String = *
 	// Whether the map can be rotated with a two-finger rotation gesture
-	touchRotate: L.Browser.touch && !L.Browser.android23
+	touchRotate: false
 });
 
 L.Map.TouchRotate = L.Handler.extend({
