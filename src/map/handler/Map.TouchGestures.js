@@ -58,7 +58,6 @@ L.Map.TouchGestures = L.Handler.extend({
 		} else {
 			this._rotating = false;
 		}
-		this._rotated = false;
 
 		this._moved = false;
 
@@ -89,7 +88,6 @@ L.Map.TouchGestures = L.Handler.extend({
 				/// TODO: The pivot should be the last touch point, but zoomAnimation manages to
 				///   overwrite the rotate pane position. Maybe related to #3529.
 				map.setBearing(this._startBearing - bearingDelta);
-				this._rotated = true;
 			}
 		}
 
@@ -151,10 +149,6 @@ L.Map.TouchGestures = L.Handler.extend({
 			} else {
 				this._map._resetView(this._center, this._map._limitZoom(this._zoom));
 			}
-		}
-
-		if (this.rotate && this._rotated) {
-			this._map.setBearing(this._map.getBearing());
 		}
 	}
 });
