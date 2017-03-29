@@ -741,16 +741,22 @@ L.Map = L.Evented.extend({
 	setBearing: function(theta) {
 		if (!L.Browser.any3d || !this._rotate) { return; }
 
-		var rotatePanePos = this._getRotatePanePos();
 		var halfSize = this.getSize().divideBy(2);
 		this._pivot = this._getMapPanePos().clone().multiplyBy(-1).add(halfSize);
 
-		rotatePanePos = rotatePanePos.rotateFrom(-this._bearing, this._pivot);
-
+		this._oldBearing = this._bearing;
 		this._bearing = theta * L.DomUtil.DEG_TO_RAD; // TODO: mod 360
-		this._rotatePanePos = rotatePanePos.rotateFrom(this._bearing, this._pivot);
 
-		L.DomUtil.setPosition(this._rotatePane, this._rotatePanePos, this._bearing, this._rotatePanePos);
+		var rotatePanePos = this._getRotatePanePos();
+		rotatePanePos = rotatePanePos.rotateFrom(-this._oldBearing, this._pivot);
+
+		// Because the pivot is the same as the position, this call is only used for setting the transform, not for transforming
+		// L.DomUtil.setPosition(this._rotatePane, this._rotatePanePos, this._bearing, this._rotatePanePos);
+
+		L.DomUtil.setPosition(this._rotatePane, rotatePanePos, this._bearing, this._pivot);
+
+		// TODO Replace with other method (reading out the transform values?)
+		this._rotatePanePos = rotatePanePos.rotateFrom(this._bearing, this._pivot);
 
 		this.fire('rotate');
 	},
