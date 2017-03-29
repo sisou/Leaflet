@@ -194,6 +194,7 @@ L.DomUtil = {
 				'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') +
 				(scale ? ' scale(' + scale + ')' : '');
 		} else {
+
 			pos = pos.rotateFrom(bearing, pivot);
 
 			if(el.classList.contains('leaflet-rotate-pane')) {
@@ -203,6 +204,7 @@ L.DomUtil = {
 					' rotate(' + bearing + 'rad)';
 			}
 			else {
+				// console.log(pos);
 				el.style[L.DomUtil.TRANSFORM] =
 					'translate3d(' + pos.x + 'px,' + pos.y + 'px' + ',0)' +
 					(scale ? ' scale(' + scale + ')' : '');
