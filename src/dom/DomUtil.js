@@ -194,7 +194,6 @@ L.DomUtil = {
 				'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') +
 				(scale ? ' scale(' + scale + ')' : '');
 		} else {
-
 			pos = pos.rotateFrom(bearing, pivot);
 
 			el.style[L.DomUtil.TRANSFORM] =

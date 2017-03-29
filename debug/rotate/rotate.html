@@ -31,22 +31,22 @@
 		position:absolute;
 		width:1px;
 		height:1px;
-		border: 2px solid red;
-		z-index: 9000;
+		border: 1px dotted green;
+		z-index: 100;
 	}
 	div.pivot {
 		position:absolute;
 		width:1px;
 		height:1px;
-		border: 2px solid purple;
-		z-index: 9000;
+		border: 1px dotted purple;
+		z-index: 100;
 	}
 	div.pixelorigin {
 		position:absolute;
 		width:1px;
 		height:1px;
-		border: 2px solid cyan;
-		z-index: 9000;
+		border: 1px dotted cyan;
+		z-index: 100;
 	}
 	div.panebounds.main {
 		position:absolute;
@@ -147,10 +147,10 @@
 				.addLayer(osm)
 				.addLayer(path);
 
-		var marker1 = L.marker(kyiv).addTo(map);
-			marker2 = L.marker(lnd).addTo(map);
-			marker4 = L.marker(sf).addTo(map),
+		var marker1 = L.marker(kyiv).addTo(map),
+			marker2 = L.marker(lnd).addTo(map),
 			marker3 = L.marker(dc).addTo(map),
+			marker4 = L.marker(sf).addTo(map),
 			marker5 = L.marker(trd).addTo(map);
 
 		var loremIpsum = "<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede.</p><p>Donec nec justo eget felis facilisis fermentum. Aliquam porttitor mauris sit amet orci. Aenean dignissim pellentesque.</p>";
