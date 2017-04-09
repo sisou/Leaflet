@@ -9,6 +9,7 @@
 .leaflet-map-pane canvas,
 .leaflet-zoom-box,
 .leaflet-image-layer,
+.leaflet-object-layer,
 .leaflet-layer {
 	position: absolute;
 	left: 0;
@@ -44,7 +45,8 @@
 .leaflet-container .leaflet-overlay-pane svg,
 .leaflet-container .leaflet-marker-pane img,
 .leaflet-container .leaflet-tile-pane img,
-.leaflet-container img.leaflet-image-layer {
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container object.leaflet-object-layer {
 	max-width: none !important;
 	}
 
@@ -219,6 +221,7 @@
 .leaflet-marker-icon,
 .leaflet-marker-shadow,
 .leaflet-image-layer,
+.leaflet-object-layer,
 .leaflet-pane > svg path,
 .leaflet-tile-container {
 	pointer-events: none;
@@ -226,6 +229,7 @@
 
 .leaflet-marker-icon.leaflet-interactive,
 .leaflet-image-layer.leaflet-interactive,
+.leaflet-object-layer.leaflet-interactive,
 .leaflet-pane > svg path.leaflet-interactive {
 	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
 	pointer-events: auto;

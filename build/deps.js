@@ -54,6 +54,11 @@ var deps = {
 		desc: 'Used to display an image over a particular rectangular area of the map.'
 	},
 
+	ObjectOverlay: {
+		src: ['layer/ObjectOverlay.js'],
+		desc: 'Used to display an object (primarily meant for interactive SVG images) over a particular rectangular area of the map.'
+	},
+
 	Marker: {
 		src: ['layer/marker/Icon.js',
 		      'layer/marker/Icon.Default.js',
@@ -216,7 +221,7 @@ var deps = {
 		src: ['map/handler/Map.CompassBearing.js'],
 		desc: 'Enables rotating the map based on the device compass'
 	},
-	
+
 	MarkerDrag: {
 		src: ['layer/marker/Marker.Drag.js'],
 		deps: ['Marker'],

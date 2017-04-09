@@ -1,6 +1,6 @@
 /*
- * @class ImageOverlay
- * @aka L.ImageOverlay
+ * @class ObjectOverlay
+ * @aka L.ObjectOverlay
  * @inherits Interactive layer
  *
  * Used to load and display a single image over specific bounds of the map. Extends `Layer`.
@@ -10,14 +10,14 @@
  * ```js
  * var imageUrl = 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
  * 	imageBounds = [[40.712216, -74.22655], [40.773941, -74.12544]];
- * L.imageOverlay(imageUrl, imageBounds).addTo(map);
+ * L.objectOverlay(imageUrl, imageBounds).addTo(map);
  * ```
  */
 
-L.ImageOverlay = L.Layer.extend({
+L.ObjectOverlay = L.Layer.extend({
 
 	// @section
-	// @aka ImageOverlay options
+	// @aka ObjectOverlay options
 	options: {
 		// @option opacity: Number = 1.0
 		// The opacity of the image overlay.
@@ -37,7 +37,11 @@ L.ImageOverlay = L.Layer.extend({
 
 		// @option crossOrigin: Boolean = false
 		// If true, the image will have its crossOrigin attribute set to ''. This is needed if you want to access image pixel data.
-		crossOrigin: false
+		crossOrigin: false,
+
+		// @option type: String = 'image/svg+xml'
+		// The mimetype of the object data
+		type: 'image/svg+xml'
 	},
 
 	initialize: function (url, bounds, options) { // (String, LatLngBounds, Object)
@@ -48,8 +52,8 @@ L.ImageOverlay = L.Layer.extend({
 	},
 
 	onAdd: function () {
-		if (!this._image) {
-			this._initImage();
+		if (!this._object) {
+			this._initObject();
 
 			if (this.options.opacity < 1) {
 				this._updateOpacity();
@@ -57,18 +61,18 @@ L.ImageOverlay = L.Layer.extend({
 		}
 
 		if (this.options.interactive) {
-			L.DomUtil.addClass(this._image, 'leaflet-interactive');
-			this.addInteractiveTarget(this._image);
+			L.DomUtil.addClass(this._object, 'leaflet-interactive');
+			this.addInteractiveTarget(this._object);
 		}
 
-		this.getPane().appendChild(this._image);
+		this.getPane().appendChild(this._object);
 		this._reset();
 	},
 
 	onRemove: function () {
-		L.DomUtil.remove(this._image);
+		L.DomUtil.remove(this._object);
 		if (this.options.interactive) {
-			this.removeInteractiveTarget(this._image);
+			this.removeInteractiveTarget(this._object);
 		}
 	},
 
@@ -77,7 +81,7 @@ L.ImageOverlay = L.Layer.extend({
 	setOpacity: function (opacity) {
 		this.options.opacity = opacity;
 
-		if (this._image) {
+		if (this._object) {
 			this._updateOpacity();
 		}
 		return this;
@@ -94,7 +98,7 @@ L.ImageOverlay = L.Layer.extend({
 	// Brings the layer to the top of all overlays.
 	bringToFront: function () {
 		if (this._map) {
-			L.DomUtil.toFront(this._image);
+			L.DomUtil.toFront(this._object);
 		}
 		return this;
 	},
@@ -103,7 +107,7 @@ L.ImageOverlay = L.Layer.extend({
 	// Brings the layer to the bottom of all overlays.
 	bringToBack: function () {
 		if (this._map) {
-			L.DomUtil.toBack(this._image);
+			L.DomUtil.toBack(this._object);
 		}
 		return this;
 	},
@@ -113,8 +117,8 @@ L.ImageOverlay = L.Layer.extend({
 	setUrl: function (url) {
 		this._url = url;
 
-		if (this._image) {
-			this._image.src = url;
+		if (this._object) {
+			this._object.data = url;
 		}
 		return this;
 	},
@@ -150,54 +154,57 @@ L.ImageOverlay = L.Layer.extend({
 	},
 
 	getElement: function () {
-		return this._image;
+		return this._object;
 	},
 
-	_initImage: function () {
-		var img = this._image = L.DomUtil.create('img',
-				'leaflet-image-layer ' + (this._zoomAnimated ? 'leaflet-zoom-animated' : ''));
+	_initObject: function () {
+		var obj = this._object = L.DomUtil.create('object',
+				'leaflet-object-layer ' + (this._zoomAnimated ? 'leaflet-zoom-animated' : ''));
 
-		img.onselectstart = L.Util.falseFn;
-		img.onmousemove = L.Util.falseFn;
+		obj.onselectstart = L.Util.falseFn;
+		obj.onmousemove = L.Util.falseFn;
 
-		img.onload = L.bind(this.fire, this, 'load');
+		obj.onload = L.bind(this.fire, this, 'load');
 
 		if (this.options.crossOrigin) {
-			img.crossOrigin = '';
+			obj.crossOrigin = '';
 		}
 
-		img.src = this._url;
-		img.alt = this.options.alt;
+		obj.data = this._url;
+		obj.type = this.options.type;
+		obj.alt = this.options.alt;
 	},
 
 	_animateZoom: function (e) {
 		var scale = this._map.getZoomScale(e.zoom),
 		    offset = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center);
 
-		L.DomUtil.setTransform(this._image, offset, scale);
+		L.DomUtil.setTransform(this._object, offset, scale);
 	},
 
 	_reset: function () {
-		var image = this._image,
+		var object = this._object,
 		    bounds = new L.Bounds(
 		        this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
 		        this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
 		    size = bounds.getSize();
 
-		L.DomUtil.setPosition(image, bounds.min);
+		L.DomUtil.setPosition(object, bounds.min);
 
-		image.style.width  = size.x + 'px';
-		image.style.height = size.y + 'px';
+		// The order of these statements is important!
+		// If the width is set first, the object does not recalculate the position of the contained SVG
+		object.style.height = size.y + 'px';
+		object.style.width  = size.x + 'px';
 	},
 
 	_updateOpacity: function () {
-		L.DomUtil.setOpacity(this._image, this.options.opacity);
+		L.DomUtil.setOpacity(this._object, this.options.opacity);
 	}
 });
 
-// @factory L.imageOverlay(imageUrl: String, bounds: LatLngBounds, options?: ImageOverlay options)
+// @factory L.objectOverlay(imageUrl: String, bounds: LatLngBounds, options?: ObjectOverlay options)
 // Instantiates an image overlay object given the URL of the image and the
 // geographical bounds it is tied to.
-L.imageOverlay = function (url, bounds, options) {
-	return new L.ImageOverlay(url, bounds, options);
+L.objectOverlay = function (url, bounds, options) {
+	return new L.ObjectOverlay(url, bounds, options);
 };
