@@ -24,6 +24,8 @@ L.Map.DoubleClickZoom = L.Handler.extend({
 	},
 
 	_onDoubleClick: function (e) {
+		if(e.originalEvent.target !== this._map._container) return false;
+
 		var map = this._map,
 		    oldZoom = map.getZoom(),
 		    delta = map.options.zoomDelta,
